@@ -163,8 +163,10 @@ class IntegerGMP(IntegerBase):
             result = _gmp.gmp_sscanf(tobytes(str(value)), b"%Zd", self._mpz_p)
             if result != 1:
                 raise ValueError("Error converting '%d'" % value)
-        else:
+        elif isinstance(value, IntegerGMP):
             _gmp.mpz_init_set(self._mpz_p, value._mpz_p)
+        else:
+            raise NotImplementedError
 
     # Conversions
     def __int__(self):
@@ -290,7 +292,10 @@ class IntegerGMP(IntegerBase):
     def __add__(self, term):
         result = IntegerGMP(0)
         if not isinstance(term, IntegerGMP):
-            term = IntegerGMP(term)
+            try:
+                term = IntegerGMP(term)
+            except NotImplementedError:
+                return NotImplemented
         _gmp.mpz_add(result._mpz_p,
                      self._mpz_p,
                      term._mpz_p)
@@ -299,7 +304,10 @@ class IntegerGMP(IntegerBase):
     def __sub__(self, term):
         result = IntegerGMP(0)
         if not isinstance(term, IntegerGMP):
-            term = IntegerGMP(term)
+            try:
+                term = IntegerGMP(term)
+            except NotImplementedError:
+                return NotImplemented
         _gmp.mpz_sub(result._mpz_p,
                      self._mpz_p,
                      term._mpz_p)
@@ -308,7 +316,10 @@ class IntegerGMP(IntegerBase):
     def __mul__(self, term):
         result = IntegerGMP(0)
         if not isinstance(term, IntegerGMP):
-            term = IntegerGMP(term)
+            try:
+                term = IntegerGMP(term)
+            except NotImplementedError:
+                return NotImplemented
         _gmp.mpz_mul(result._mpz_p,
                      self._mpz_p,
                      term._mpz_p)
@@ -316,7 +327,10 @@ class IntegerGMP(IntegerBase):
 
     def __floordiv__(self, divisor):
         if not isinstance(divisor, IntegerGMP):
-            divisor = IntegerGMP(divisor)
+            try:
+                divisor = IntegerGMP(divisor)
+            except NotImplementedError:
+                return NotImplemented
         if _gmp.mpz_cmp(divisor._mpz_p,
                         self._zero_mpz_p) == 0:
             raise ZeroDivisionError("Division by zero")
@@ -328,7 +342,10 @@ class IntegerGMP(IntegerBase):
 
     def __mod__(self, divisor):
         if not isinstance(divisor, IntegerGMP):
-            divisor = IntegerGMP(divisor)
+            try:
+                divisor = IntegerGMP(divisor)
+            except NotImplementedError:
+                return NotImplemented
         comp = _gmp.mpz_cmp(divisor._mpz_p,
                             self._zero_mpz_p)
         if comp == 0:
